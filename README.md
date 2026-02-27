@@ -150,9 +150,20 @@ claude
 /brainstorm → /spec → [承認] → /implement → /review → /test → /compound
 ```
 
+各フェーズを段階的に実行する場合:
+
+```bash
+/brainstorm    # 要件を深掘り（ソクラテス式対話で仕様をクリアにする）
+/spec          # 仕様書・設計・タスクリストを生成（ユーザー承認が必要）
+/implement     # TDD で実装（RED→GREEN→REFACTOR）
+/review        # 7 専門レビュアーによる並列コードレビュー
+/test          # テスト実行・Lint・ビルド検証・カバレッジ確認
+/compound      # 学びを記録してスペックにマージ
+```
+
 または、ワンコマンドで全パイプラインを実行:
 
-```
+```bash
 /ship ログイン機能を追加したい
 ```
 
