@@ -279,7 +279,7 @@ Main Agent（オーケストレーション層 / チームリーダー）
 | 禁止操作 | 理由 | 代替手段 |
 |---|---|---|
 | Write / Edit で実装ファイルを編集 | コンテキスト汚染 | Task(implementer) / teammate に委譲 |
-| 実装ファイル（`.ts`, `.tsx`）の Read | コンテキスト膨張 | Explore Agent / implementer に委譲 |
+| 実装ファイル（`.kt`）の Read | コンテキスト膨張 | Explore Agent / implementer に委譲 |
 | SKILL.md の Read | コンテキスト汚染 | スキル名のみ決定、Claude Code が自動解決 |
 | `git diff`（ファイル内容表示） | 大量 diff でコンテキスト圧迫 | `git diff --stat` のみ許可 |
 
