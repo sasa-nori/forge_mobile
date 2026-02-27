@@ -1,4 +1,4 @@
-# Core Essentials
+# Core Essentials（React Native版）
 
 常時読み込みされる最小限のルール。詳細は `~/.claude/reference/` を必要に応じて参照。
 
@@ -9,14 +9,14 @@
 ### 必須エスカレーション（`AskUserQuestion` で確認）
 
 - **セキュリティ**: 認証・認可ロジックの設計・変更、暗号化方式の選択、PII処理方法
-- **データ**: データストアのスキーマ変更（MMKV/AsyncStorage のキー構造変更）、データ整合性に影響する変更
-- **アーキテクチャ**: 新サービス・新モジュール追加、破壊的API変更、レイヤー構成変更
-- **本番環境**: デプロイ設定、環境変数変更、ロールバック手順
+- **データ**: AsyncStorage/SecureStore スキーマ変更、データ整合性に影響する変更
+- **アーキテクチャ**: 新スクリーン・新モジュール追加、破壊的API変更、グローバル状態の設計変更
+- **本番環境**: デプロイ設定、環境変数変更、ネイティブモジュール追加
 
 ### 状況依存エスカレーション（自信がなければ確認）
 
 - 仕様の曖昧性・複数解釈が可能な場合
-- 技術的に同等な複数アプローチの選択
+- 技術的に同等な複数アプローチの選択（Zustand vs Redux 等）
 - スコープ外の関連変更が必要になった場合
 
 ### 自律判断OK
@@ -30,13 +30,12 @@
 ## セキュリティ必須事項
 
 - ハードコードされたシークレット・APIキー・認証情報禁止
-- 機密情報は `expo-secure-store` または `react-native-keychain` を使用（AsyncStorage への平文保存禁止）
-- ユーザー入力は必ず検証・サニタイズ（Zod スキーマを使用したランタイムバリデーション）
-- `http://` から始まる URL を本番で使用しない（cleartext 通信禁止）
-- 証明書ピニングを実装（重要 API エンドポイント: `react-native-ssl-pinning` 等を使用）
-- リリースビルドで Hermes エンジンを有効化し、Metro bundler の minify を適用
-- Deep Link / Universal Link のパラメータを検証なしにナビゲーションや認証に使用しない
-- 依存関係: `npm audit` で脆弱性確認
+- JWT トークン・パスワードは SecureStore または Keychain に保存（AsyncStorage 禁止）
+- ユーザー入力は必ずバリデーション（Zod スキーマを使用）
+- HTTP 通信を禁止（本番環境では HTTPS のみ）
+- Deep Link パラメータは必ずバリデーション（Zod で型チェック）
+- `console.log` にトークン・個人情報を出力しない
+- 依存関係の脆弱性を定期確認（`npm audit`）
 
 ---
 
@@ -62,6 +61,6 @@
 | `reference/common/testing.md` | テスト作成・TDD実践時 |
 | `reference/common/performance.md` | パフォーマンス最適化時 |
 | `reference/react-native/conventions.md` | React Native全般・コンポーネント・スタイリング作業時 |
-| `reference/react-native/component-patterns.md` | React Native コンポーネント設計パターン確認時 |
-| `reference/async-storage/conventions.md` | AsyncStorage・MMKV データ永続化作業時 |
-| `reference/tanstack-query/conventions.md` | TanStack Query・APIレイヤー実装時 |
+| `reference/react-navigation/conventions.md` | React Navigation実装・画面遷移・ディープリンク作業時 |
+| `reference/async-storage/conventions.md` | AsyncStorage・データ永続化作業時 |
+| `reference/api/conventions.md` | TanStack Query・APIレイヤー実装時 |
