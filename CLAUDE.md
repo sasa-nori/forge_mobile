@@ -14,9 +14,10 @@
 ## Forge ワークフロー
 
 ```
-/brainstorm → /spec → [spec-validate] → [承認] → /implement → /review → /test → /compound
+/setup（初回） → /brainstorm → /spec → [spec-validate] → [承認] → /implement → /review → /test → /compound
 ```
 
+- `/setup` はプロジェクトの技術スタックを検出し、対話的にスキルをインストール・設定する（初回のみ）
 - `/ship` は上記を連鎖実行する完全自律パイプライン
 - `/brainstorm` と `/spec`（spec-validate 含む）の後はユーザー承認必須
 - `/implement` 以降は自律実行（テスト失敗時は最大3回リトライ）
@@ -87,7 +88,7 @@ openspec/
 | データ | prisma-expert, database-migrations |
 | テスト | vitest-testing-patterns, webapp-testing |
 | インフラ | terraform-gcp-expert |
-| 設計 | architecture-patterns |
+| 設計 | architecture-patterns, skill-creator |
 
 ---
 
