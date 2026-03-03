@@ -1,6 +1,6 @@
 # Core Essentials
 
-常時読み込みされる最小限のルール。詳細は `~/.claude/reference/` を必要に応じて参照。
+常時読み込みされる最小限のルール。詳細は `reference/` を必要に応じて参照。
 
 ---
 
@@ -40,11 +40,49 @@
 
 ---
 
-## Git コミット形式
+## Skill 1% ルール
+
+**1% でも適用される可能性があれば、そのスキルを呼び出せ。**
+
+スキルの呼び出しコストは低い。呼び出さなかったことによる品質低下コストは高い。迷ったら呼び出す。
+
+---
+
+## Context Isolation Policy
+
+Main Agent はオーケストレーション専任。以下を厳守:
+
+| 禁止操作 | 代替手段 |
+|---|---|
+| Write/Edit で実装ファイル編集 | Task(implementer) に委譲 |
+| 実装ファイル（.ts/.tsx）の Read | Explore Agent / implementer に委譲 |
+| SKILL.md の Read | スキル名のみ決定、Claude Code が自動解決 |
+| `git diff`（内容表示） | `git diff --stat` のみ許可 |
+
+詳細: `reference/context-isolation.md`
+
+---
+
+## Git・コミット
 
 - 形式: `<type>(<scope>): <日本語の説明>`
 - type: `feat` / `fix` / `refactor` / `test` / `docs` / `chore` / `perf`
 - 1コミット = 1つの論理的変更、動く状態でコミット
+- PR説明は日本語
+- 小さく焦点を絞ったコミット
+- コミット前に `git diff` でレビュー
+
+---
+
+## コード品質
+
+- TypeScript strict mode 準拠
+- 既存のコード規約・パターンを踏襲
+- コードやコメントにエモジを入れない
+- TDD: RED → GREEN → REFACTOR
+- テストをスキップ・無効化して通過させない
+- TODO/モック/スタブを本実装に残さない
+- `npx tsc --noEmit` をコミット前に実行
 
 ---
 
