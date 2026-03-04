@@ -6,6 +6,11 @@ argument-hint: "<topic>"
 
 # /brainstorm コマンド
 
+REQUIRED SKILLS:
+- forge-skill-orchestrator
+- story-quality-gate
+- proposal-readiness-check
+
 ## 目的
 
 機能設計の前にソクラテス式対話で要件を深掘りし、ミニマルで的確な提案書を作成する。
@@ -23,13 +28,38 @@ argument-hint: "<topic>"
 2. **一度に1つだけ質問する**（複数質問を一度に投げない）
 3. 可能な限り**選択肢形式**で質問する（A/B/C方式）
 4. **YAGNI原則**を徹底適用する -- 「それは本当に今必要か？」を常に問う
-5. 要件が十分に固まったら変更名を決定し、`openspec/changes/<change-name>/proposal.md` に提案書を出力
-6. 提案書には以下を含む：
+5. 要件が十分に固まったら変更名を決定する
+
+5.5. **技術的制約チェック**（constraints.md 参照）:
+   - 対象領域のキーワードからドメインを推論する（例: DB関連→`prisma-expert`、API関連→`nextjs-api-patterns`）
+   - 推論されたドメイン Skill の `constraints.md` を Read ツールで直接読み込む（パス: `~/.claude/skills/<skill-name>/constraints.md`）
+   - ファイルが存在しない場合はスキップする
+   - **constraints.md のみ参照する**（design.md は参照しない。brainstorm は自由な発想を優先するため）
+   - 要件と技術的制約の矛盾をチェックする
+   - 矛盾が検出された場合: 「この要件は技術的制約 [X] と矛盾する可能性があります」とユーザーに報告し、要件の修正を検討するよう提案する
+   - **このチェックはブロッキングではない**: ユーザーが「そのまま進める」と判断すれば許可する
+   - 制約が検出された場合、提案書の「技術的考慮事項」セクションに関連制約を記載する
+
+5.7. **ストーリー品質チェック**（story-quality-gate スキル参照）:
+   - 収集したユーザーストーリーを INVEST 基準（Independent, Negotiable, Valuable, Estimatable, Small, Testable）で軽量チェックする
+   - Warn が出た項目はユーザーに提示し、改善するか・このまま進めるか質問する
+   - **このチェックはブロッキングではない**: ユーザーが「そのまま進める」と判断すれば許可する
+   - 改善しない Warn 項目は「未解決の疑問点」に転記する
+
+6. `openspec/changes/<change-name>/proposal.md` に提案書を出力
+7. 提案書には以下を含む：
    - 意図（なぜこの変更が必要か）
    - ユーザーストーリー
    - 対象領域
    - スコープ外の明示（YAGNIで除外したもの）
+   - 技術的考慮事項（ステップ5.5 で制約が検出された場合のみ）
    - 未解決の疑問点
+
+7.5. **提案書準備完了チェック**（proposal-readiness-check スキル参照）:
+   - 生成した proposal.md が /spec の入力として十分か、5項目（意図の明確性、ストーリーの具体性、スコープの境界、変更の規模感、未解決の疑問点）で確認する
+   - No の項目があれば追加質問で補完を試みる
+   - 補完後に proposal.md を更新する
+   - **このチェックはブロッキングではない**: ユーザーが「そのまま進める」と判断すれば許可する
 
 ## 変更名の決定ルール
 
@@ -61,6 +91,10 @@ argument-hint: "<topic>"
 
 ## スコープ外（Out of Scope）
 - [除外した機能]: [除外理由 -- YAGNI]
+
+## 技術的考慮事項（Technical Considerations）
+- [関連する技術的制約と、要件への影響]
+<!-- constraints.md チェックで制約が検出されなかった場合、このセクションは省略可 -->
 
 ## 未解決の疑問点（Open Questions）
 - [疑問]
