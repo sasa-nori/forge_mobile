@@ -29,6 +29,84 @@ confirm() {
   [[ "$response" =~ ^[Yy]$ ]]
 }
 
+# ~/.claude.json の mcpServers に指定の名前が存在するか確認
+mcp_installed() {
+  local name="$1"
+  python3 - <<PYEOF 2>/dev/null
+import json
+try:
+    with open('${HOME}/.claude.json') as f:
+        d = json.load(f)
+    print('yes' if '${name}' in d.get('mcpServers', {}) else 'no')
+except Exception:
+    print('no')
+PYEOF
+}
+
+install_required_mcps() {
+  echo "--- 必須 MCP の確認 ---"
+
+  # --- Context7 MCP ---
+  if [[ "$(mcp_installed 'context7')" == "yes" ]]; then
+    ok "context7" "インストール済み"
+  else
+    info "context7" "未インストール → 追加します"
+    if claude mcp add --scope user context7 -- npx -y @upstash/context7-mcp 2>/dev/null; then
+      ok "context7" "インストール完了"
+    else
+      warn "context7" "インストール失敗（手動で追加: claude mcp add --scope user context7 -- npx -y @upstash/context7-mcp）"
+    fi
+  fi
+
+  # --- Web Search MCP ---
+  local web_search_name=""
+  for name in brave-search tavily brave tavily-search web-search; do
+    if [[ "$(mcp_installed "$name")" == "yes" ]]; then
+      web_search_name="$name"
+      break
+    fi
+  done
+
+  if [[ -n "$web_search_name" ]]; then
+    ok "web-search" "インストール済み (${web_search_name})"
+  elif $FORCE; then
+    warn "web-search MCP" "未インストール（--yes モードではスキップ）"
+    info "web-search MCP" "後で手動追加: claude mcp add --scope user brave-search -e BRAVE_API_KEY=<key> -- npx -y @modelcontextprotocol/server-brave-search"
+  else
+    echo ""
+    warn "web-search MCP" "未インストール（/spec の web-researcher エージェントが使用）"
+    echo ""
+    echo "  Web Search MCP を選択してください:"
+    echo "  1) Brave Search MCP  (BRAVE_API_KEY が必要)"
+    echo "  2) Tavily MCP        (TAVILY_API_KEY が必要)"
+    echo "  3) スキップ          (後で手動設定)"
+    read -r -p "  選択 [1/2/3]: " mcp_choice
+    case "$mcp_choice" in
+      1)
+        read -r -p "  BRAVE_API_KEY: " brave_key
+        if [[ -n "$brave_key" ]] && claude mcp add --scope user -e "BRAVE_API_KEY=${brave_key}" brave-search -- npx -y @modelcontextprotocol/server-brave-search 2>/dev/null; then
+          ok "brave-search" "インストール完了"
+        else
+          warn "brave-search" "インストール失敗（手動で追加してください）"
+        fi
+        ;;
+      2)
+        read -r -p "  TAVILY_API_KEY: " tavily_key
+        if [[ -n "$tavily_key" ]] && claude mcp add --scope user -e "TAVILY_API_KEY=${tavily_key}" tavily -- npx -y tavily-mcp 2>/dev/null; then
+          ok "tavily" "インストール完了"
+        else
+          warn "tavily" "インストール失敗（手動で追加してください）"
+        fi
+        ;;
+      *)
+        warn "web-search MCP" "スキップ（/spec の web-researcher が動作しません）"
+        ;;
+    esac
+  fi
+
+  echo ""
+}
+
 usage() {
   cat <<EOF
 Usage: $(basename "$0") <PLATFORM> [OPTIONS]
@@ -196,6 +274,9 @@ else
 fi
 
 echo ""
+
+# --- 必須 MCP のインストール ---
+install_required_mcps
 
 # --- 検証 ---
 echo "--- 検証 ---"
