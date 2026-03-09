@@ -11,6 +11,7 @@ FORGE_DIRS=(commands agents skills rules reference hooks docs)
 CLAUDE_HOME="${HOME}/.claude"
 BACKUP_BASE="${CLAUDE_HOME}/backups"
 FORCE=false
+PLATFORM=""
 
 # --- 自己位置特定 ---
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
@@ -30,15 +31,25 @@ confirm() {
 
 usage() {
   cat <<EOF
-Usage: $(basename "$0") [OPTIONS]
+Usage: $(basename "$0") <PLATFORM> [OPTIONS]
 
 Forge を ~/.claude/ にシンボリックリンク方式でインストールします。
 各ディレクトリ内の個別要素単位でリンクを作成し、ユーザー独自の資産と共存可能です。
 git pull で更新が自動反映されます。
 
+PLATFORM:
+  Android       Android (Kotlin / Jetpack Compose)
+  iOS           iOS (Swift / SwiftUI)
+  Flutter       Flutter (Dart / BLoC / Riverpod)
+  ReactNative   React Native (TypeScript)
+
 Options:
   -y, --yes    確認プロンプトをスキップ（非対話モード）
   -h, --help   このヘルプを表示
+
+例:
+  $(basename "$0") Android
+  $(basename "$0") iOS --yes
 EOF
   exit 0
 }
@@ -46,11 +57,17 @@ EOF
 # --- 引数パース ---
 while [[ $# -gt 0 ]]; do
   case "$1" in
+    Android|iOS|Flutter|ReactNative) PLATFORM="$1"; shift ;;
     -y|--yes) FORCE=true; shift ;;
     -h|--help) usage ;;
     *) echo "Unknown option: $1"; usage ;;
   esac
 done
+
+# --- プラットフォーム解決 ---
+if [[ -n "$PLATFORM" ]]; then
+  FORGE_ROOT="${SCRIPT_DIR}/${PLATFORM}"
+fi
 
 # --- Forge リポジトリの検証 ---
 echo ""

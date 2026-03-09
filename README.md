@@ -160,24 +160,30 @@ forge_mobile/
 
 ### 使用するプラットフォームのインストール
 
-使用したいプラットフォームのディレクトリの内容を `~/.claude/` にコピーします。
+リポジトリをクローンし、インストールスクリプトでプラットフォームを指定して実行します。
+シンボリックリンク方式のため、`git pull` で更新が自動反映されます。
 
 ```bash
-# 例: iOS Forge をインストールする場合
-cd forge_mobile/iOS
-rsync -av --exclude='.git' --exclude='openspec' ./ ~/.claude/
+git clone https://github.com/sasa-nori/forge_mobile.git
+cd forge_mobile
 
-# 例: Flutter Forge をインストールする場合
-cd forge_mobile/Flutter
-rsync -av --exclude='.git' --exclude='openspec' ./ ~/.claude/
+# Android Forge をインストール
+./install.sh Android
 
-# 例: React Native Forge をインストールする場合
-cd forge_mobile/ReactNative
-rsync -av --exclude='.git' --exclude='openspec' ./ ~/.claude/
+# iOS Forge をインストール
+./install.sh iOS
 
-# 例: Android Forge をインストールする場合（既存）
-cd forge_mobile/Android
-rsync -av --exclude='.git' --exclude='openspec' ./ ~/.claude/
+# Flutter Forge をインストール
+./install.sh Flutter
+
+# React Native Forge をインストール
+./install.sh ReactNative
+```
+
+アンインストールする場合:
+
+```bash
+./uninstall.sh Android   # または iOS / Flutter / ReactNative
 ```
 
 > **注意**: 既に `~/.claude/settings.json` が存在する場合は、手動でマージしてください。
